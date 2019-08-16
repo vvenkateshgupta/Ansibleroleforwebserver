@@ -1,0 +1,99 @@
+---
+  - name: Update and upgrade apt packages
+    apt:
+      upgrade: yes
+      update_cache: yes
+      cache_valid_time: 86400 #One day
+
+  - name: install JDK 11
+    apt:
+      name: openjdk-11-jdk
+      state: present
+
+  - name: add tomcat group
+    group:
+      name: tomcat
+
+  - name: add tomcat user
+    user:
+      name: tomcat
+      group: tomcat
+      home: /user/share/tomcat
+      createhome: no
+
+  - name: create /opt/tomcat directory
+    file:
+      path: /opt/tomcat
+      state: directory
+      mode: 0755
+
+  - name: download & unarchive
+    unarchive:
+      src: http://apache.cs.utah.edu/tomcat/tomcat-9/v9.0.22/bin/apache-tomcat-9.0.22.tar.gz
+      dest: /opt/tomcat
+      remote_src: yes
+      extra_opts: [--strip-components=1]
+
+  - name: Change ownership
+    file:
+      path: /opt/tomcat
+      owner: tomcat
+      group: tomcat
+      mode: "u+rwx,g+rx,o=rx"
+      recurse: yes
+      state: directory
+
+  - name: Copy Tomcat service from local to remote
+    copy:
+       src: tomcat.service
+       dest: /etc/systemd/system/
+       mode: 0755
+
+  - name: Start and enable Tomcat service
+    systemd:
+      name: tomcat
+      state: started
+      enabled: true
+      daemon_reload: true
+  
+  - name: Copy index.html to apache
+    copy:
+       src: index.html
+       dest: /opt/tomcat/webapps/ROOT/index.html
+       mode: 0755
+  
+  - name: copy image files to apache folder
+    copy:
+       src: img_5terre.jpg 
+       dest: /opt/tomcat/webapps/ROOT/
+       mode: 0777
+
+  - name: copy image files to apache folder
+    copy:
+       src: img_corniglia.jpg  
+       dest: /opt/tomcat/webapps/ROOT/
+       mode: 0777
+
+  - name: copy image files to apache folder
+    copy:
+       src: img_manarola.jpg
+       dest: /opt/tomcat/webapps/ROOT/
+       mode: 0777
+  
+  - name: copy image files to apache folder
+    copy:
+       src: img_monterosso.jpg
+       dest: /opt/tomcat/webapps/ROOT/
+       mode: 0777
+
+  - name: copy image files to apache folder
+    copy:
+       src: img_riomaggiore.jpg
+       dest: /opt/tomcat/webapps/ROOT/
+       mode: 0777
+
+  - name: copy image files to apache folder
+    copy:
+       src: img_vernazza.jpg
+       dest: /opt/tomcat/webapps/ROOT/
+       mode: 0777
